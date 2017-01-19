@@ -196,8 +196,9 @@ public class MarchingCubes
             {
                 var last = edges[0];
                 edges.RemoveAt( 0 );
-                
-                var faceStart = sortedEdges.Count;
+
+                if ( ShouldFlip( last ) ) last = last.Reverse;
+
                 sortedEdges.Add( last );
 
                 var a = Array.IndexOf( _vertices, last.A );
@@ -223,6 +224,22 @@ public class MarchingCubes
 
             _edges = sortedEdges.ToArray();
             _triangles = triangles.ToArray();
+        }
+
+        private static bool ShouldFlip( Edge edge )
+        {
+            var aa = _sVectorLookup[edge.A.A];
+            var ab = _sVectorLookup[edge.A.B];
+            var ba = _sVectorLookup[edge.B.A];
+            var bb = _sVectorLookup[edge.B.B];
+
+            var a = (aa + ab) * 0.5f;
+            var b = (ba + bb) * 0.5f;
+
+            var solidMidPoint = (aa + ba) * 0.5f;
+            var cross = Vector3.Cross( a - solidMidPoint, b - a );
+
+            return Vector3.Dot( cross, (a + b) * 0.5f - new Vector3( 0.5f, 0.5f, 0.5f ) ) >= 0f;
         }
 
         [ThreadStatic] private static int[] _sVertexIndices;
