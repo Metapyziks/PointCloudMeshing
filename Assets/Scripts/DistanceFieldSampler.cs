@@ -217,15 +217,10 @@ public class DistanceFieldSampler : MonoBehaviour
             Result.Resize( Resolution, Resolution, TextureFormat.RGB24, false );
         }
 
-        var pathNodes = Path.GetComponentsInChildren<PathNode>();
-
         if ( _sPath == null ) _sPath = new List<Vertex>();
         else _sPath.Clear();
 
-        foreach ( var pathNode in pathNodes )
-        {
-            _sPath.Add( new Vertex(pathNode) );
-        }
+        Path.GetVertices( _sPath );
 
         if ( _sBuffer == null || _sBuffer.Length < Resolution * Resolution )
         {

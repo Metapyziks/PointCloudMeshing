@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 using UnityEngine;
 
 public class Path : MonoBehaviour
@@ -34,6 +35,15 @@ public class Path : MonoBehaviour
     public void LineTo( float x, float y, float z )
     {
         AddNode( new Vector3( x, y, z ), false );
+    }
+
+    public void GetVertices( List<DistanceFieldSampler.Vertex> dest )
+    {
+        var pathNodes = GetComponentsInChildren<PathNode>();
+        foreach ( var pathNode in pathNodes )
+        {
+            dest.Add( new DistanceFieldSampler.Vertex(pathNode) );
+        }
     }
 
     [UsedImplicitly]

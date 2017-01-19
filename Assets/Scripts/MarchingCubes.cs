@@ -308,14 +308,15 @@ public class MarchingCubes
     public Vector3 CubePos { get; set; }
     public float Threshold { get; set; }
     
+    private readonly Dictionary<Vector3, int> _indexMap = new Dictionary<Vector3, int>();
     private readonly List<int> _indices = new List<int>();
     private readonly List<Vector3> _vertices = new List<Vector3>();
 
-    public MarchingCubes( Vector3 cubeSize )
+    public MarchingCubes()
     {
         PopulateLookupTable();
 
-        CubeSize = cubeSize;
+        CubeSize = Vector3.one;
         Threshold = 0.5f;
     }
 
@@ -339,6 +340,7 @@ public class MarchingCubes
 
     public void Clear()
     {
+        _indexMap.Clear();
         _indices.Clear();
         _vertices.Clear();
     }
@@ -377,10 +379,26 @@ public class MarchingCubes
 
     private int WriteVertex( Vector3 vertex )
     {
-        // TODO: Lookup existing vertices
+        const int res = 4;
+        const float invRes = 1f / res;
 
+        vertex.x = (int) (vertex.x * res) * invRes;
+        vertex.y = (int) (vertex.y * res) * invRes;
+        vertex.z = (int) (vertex.z * res) * invRes;
+
+        vertex = Vector3.Scale( vertex, CubeSize ) + CubePos;
+
+        int index;
+        if ( _indexMap.TryGetValue( vertex, out index ) )
+        {
+            return index;
+        }
+
+        index = _vertices.Count;
         _vertices.Add( vertex );
-        return _vertices.Count - 1;
+        _indexMap.Add( vertex, index );
+
+        return index;
     }
 
     public void CopyToMesh( Mesh mesh )
