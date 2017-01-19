@@ -6,7 +6,9 @@ public class MarchingCubesTest : MonoBehaviour
 {
     [Range(0f, 1f)]
     public float Threshold = 0.5f;
-    
+
+    public bool Randomize;
+
     [Range(0f, 1f)] public float X0Y0Z0 = 0f;
     [Range(0f, 1f)] public float X1Y0Z0 = 0f;
     [Range(0f, 1f)] public float X0Y1Z0 = 0f;
@@ -34,13 +36,26 @@ public class MarchingCubesTest : MonoBehaviour
     [UsedImplicitly]
     private void Update()
     {
+        if ( Randomize )
+        {
+            Randomize = false;
+
+            var random = new System.Random();
+            X0Y0Z0 = (float) random.NextDouble();
+            X1Y0Z0 = (float) random.NextDouble();
+            X0Y1Z0 = (float) random.NextDouble();
+            X1Y1Z0 = (float) random.NextDouble();
+            X0Y0Z1 = (float) random.NextDouble();
+            X1Y0Z1 = (float) random.NextDouble();
+            X0Y1Z1 = (float) random.NextDouble();
+            X1Y1Z1 = (float) random.NextDouble();
+        }
+
         var filter = GetComponent<MeshFilter>();
 
         if ( filter.sharedMesh == null ) filter.sharedMesh = new Mesh();
 
         CopyValuesToArray();
-
-        new MarchingCubes( Vector3.one );
 
         _cubes.Threshold = Threshold;
         _cubes.Clear();

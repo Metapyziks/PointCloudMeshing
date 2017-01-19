@@ -531,13 +531,13 @@ Mesh:
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
-    indexCount: 0
+    indexCount: 12
     topology: 0
     firstVertex: 0
-    vertexCount: 0
+    vertexCount: 5
     localAABB:
-      m_Center: {x: 0, y: 0, z: 0}
-      m_Extent: {x: 0, y: 0, z: 0}
+      m_Center: {x: 0.5, y: 0.322725, z: 0.5}
+      m_Extent: {x: 0.5, y: 0.322725, z: 0.5}
   m_Shapes:
     vertices: []
     shapes: []
@@ -550,11 +550,11 @@ Mesh:
   m_IsReadable: 1
   m_KeepVertices: 1
   m_KeepIndices: 1
-  m_IndexBuffer: 
+  m_IndexBuffer: 000003000200000002000400000004000100000001000000
   m_Skin: []
   m_VertexData:
     m_CurrentChannels: 3
-    m_VertexCount: 3
+    m_VertexCount: 5
     m_Channels:
     - stream: 0
       offset: 0
@@ -588,8 +588,8 @@ Mesh:
       offset: 0
       format: 0
       dimension: 0
-    m_DataSize: 72
-    _typelessdata: 0000003f0000803f0000803f0000000000000000000000000000803f0000003f0000803f0000000000000000000000000000803f0000803f0000003f000000000000000000000000
+    m_DataSize: 120
+    _typelessdata: 00000000b6dbfa3e000000004954d0bec0b95e3ff1888e3e0000803f9cab0d3f00000000192081bd416a7e3f055abbbd1651a33e000000000000803fdc7816bfe0f2223fa7abff3e00000000000000001e4a253f17b70ebf254d293f3579003f0000803f363c253f0000803fcc37c1bea517653f85f2733e
   m_CompressedMesh:
     m_Vertices:
       m_NumItems: 0
@@ -643,8 +643,8 @@ Mesh:
       m_BitSize: 0
     m_UVInfo: 0
   m_LocalAABB:
-    m_Center: {x: 0.75, y: 0.75, z: 0.75}
-    m_Extent: {x: 0.25, y: 0.25, z: 0.25}
+    m_Center: {x: 0.5, y: 0.322725, z: 0.5}
+    m_Extent: {x: 0.5, y: 0.322725, z: 0.5}
   m_MeshUsageFlags: 0
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
@@ -3725,14 +3725,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Threshold: 0.5
-  X0Y0Z0: 0
-  X1Y0Z0: 0
-  X0Y1Z0: 0
-  X1Y1Z0: 0
-  X0Y0Z1: 0
-  X1Y0Z1: 0
-  X0Y1Z1: 0
-  X1Y1Z1: 1
+  Randomize: 0
+  X0Y0Z0: 0.18
+  X1Y0Z0: 0.06338133
+  X0Y1Z0: 0.83311784
+  X1Y1Z0: 0.8523565
+  X0Y0Z1: 0.6756152
+  X1Y0Z1: 0.1250594
+  X0Y1Z1: 0.9838543
+  X1Y1Z1: 0.70595735
 --- !u!4 &698712664
 Transform:
   m_ObjectHideFlags: 0

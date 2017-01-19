@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -13,7 +14,7 @@ public class MarchingCubes
 
     private class MarchingCubesCase
     {
-        private struct Vertex
+        private struct Vertex : IEquatable<Vertex>
         {
             public readonly int A;
             public readonly int B;
@@ -28,12 +29,34 @@ public class MarchingCubes
             {
                 return string.Format( "{{{0}, {1}}}", VertexIndexToString( A ), VertexIndexToString( B ) );
             }
+
+            public override bool Equals( object obj )
+            {
+                if ( ReferenceEquals( null, obj ) ) return false;
+                return obj is Vertex && Equals( (Vertex) obj );
+            }
+
+            public bool Equals( Vertex other )
+            {
+                return A == other.A && B == other.B;
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    return (A * 397) ^ B;
+                }
+            }
         }
 
-        private struct Edge
+        private struct Edge : IEquatable<Edge>
         {
             public readonly Vertex A;
             public readonly Vertex B;
+
+            public bool IsValid { get { return !A.Equals( B ); } }
+            public Edge Reverse { get { return new Edge( B, A ); } }
 
             public Edge( Vertex a, Vertex b )
             {
@@ -45,6 +68,25 @@ public class MarchingCubes
             {
                 return string.Format( "({0}, {1})", A, B );
             }
+
+            public bool Equals( Edge other )
+            {
+                return A.Equals( other.A ) && B.Equals( other.B );
+            }
+
+            public override bool Equals( object obj )
+            {
+                if ( ReferenceEquals( null, obj ) ) return false;
+                return obj is Edge && Equals( (Edge) obj );
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    return (A.GetHashCode() * 397) ^ B.GetHashCode();
+                }
+            }
         }
 
         private struct Triangle
@@ -52,7 +94,14 @@ public class MarchingCubes
             public readonly int A;
             public readonly int B;
             public readonly int C;
-            
+
+            public Triangle( int a, int b, int c )
+            {
+                A = a;
+                B = b;
+                C = c;
+            }
+
             public override string ToString()
             {
                 return string.Format( "({0}, {1}, {2})", A, B, C );
@@ -140,8 +189,40 @@ public class MarchingCubes
                 }
             }
 
-            _edges = edges.ToArray();
-            _triangles = new Triangle[0];
+            var sortedEdges = new List<Edge>();
+            var triangles = new List<Triangle>();
+
+            while ( edges.Count > 0 )
+            {
+                var last = edges[0];
+                edges.RemoveAt( 0 );
+                
+                var faceStart = sortedEdges.Count;
+                sortedEdges.Add( last );
+
+                var a = Array.IndexOf( _vertices, last.A );
+                var b = Array.IndexOf( _vertices, last.B );
+
+                while ( edges.Count > 0 )
+                {
+                    var next = edges.FirstOrDefault( x => x.A.Equals( last.B ) || x.B.Equals( last.B ) );
+                    if ( !next.IsValid ) break;
+
+                    edges.Remove( next );
+                    
+                    last = next.A.Equals( last.B ) ? next : next.Reverse;
+                    sortedEdges.Add( last );
+
+                    var c = Array.IndexOf( _vertices, last.B );
+
+                    triangles.Add( new Triangle( a, b, c ) );
+
+                    b = c;
+                }
+            }
+
+            _edges = sortedEdges.ToArray();
+            _triangles = triangles.ToArray();
         }
 
         [ThreadStatic] private static int[] _sVertexIndices;
@@ -157,22 +238,23 @@ public class MarchingCubes
             var b = values[vertex.B];
             var t = (threshold - a) / (b - a);
 
-            var result = _sVectorLookup[vertex.A];
+            var src = _sVectorLookup[vertex.A];
+            var dst = _sVectorLookup[vertex.B];
 
             switch ( vertex.A ^ vertex.B )
             {
                 case 0x1:
-                    result.x = t;
+                    src.x += (dst.x - src.x) * t;
                     break;
                 case 0x2:
-                    result.y = t;
+                    src.y += (dst.y - src.y) * t;
                     break;
                 case 0x4:
-                    result.z = t;
+                    src.z += (dst.z - src.z) * t;
                     break;
             }
 
-            return result;
+            return src;
         }
 
         public void Write( MarchingCubes cubes, float[] values, float threshold )
@@ -286,6 +368,7 @@ public class MarchingCubes
 
     public void CopyToMesh( Mesh mesh )
     {
+        mesh.Clear();
         mesh.SetVertices( _vertices );
         mesh.SetTriangles( _indices, 0 );
         mesh.RecalculateBounds();
